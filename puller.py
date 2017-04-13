@@ -29,8 +29,7 @@ def retrieve_and_save_images(image_url):
     print("successfully pulled " + name)
 
 def get_all_urls(number):
-    #for i in range(1, number + 1):
-    for i in range(407, number + 1):
+    for i in range(1, number + 1):
         url = "https://xkcd.com/%s" % i
         try:
             temporary = urllib.request.urlopen(url)
