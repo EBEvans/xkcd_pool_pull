@@ -1,4 +1,4 @@
-#!usr/bin/python
+#!/usr/bin/python3
 
 import os
 import urllib.request
@@ -15,12 +15,14 @@ def get_latest_commic():
     number = temporary.split('m/')[-1]
     return int(number)
 
-def retrieve_and_save_images(image_url):
+def retrieve_and_save_images(image_url, failed_commics):
     name = image_url[image_url.find("s/") + 2:]
     try:
         image = urllib.request.urlopen(image_url)
     except urllib.error.URLError:
-        print("retrival error " + image_url)
+        error = "URL error " + image_url
+        print(error)
+        failed_commics.append(error)
         return
     image = image.read()
     path = os.path.join("images", name)
@@ -28,35 +30,52 @@ def retrieve_and_save_images(image_url):
     temporary.write(image)
     print("successfully pulled " + name)
 
-def get_all_urls(number):
+def get_all_urls(number, failed_commics):
     for i in range(1, number + 1):
+    #for i in range(1, 450):
         url = "https://xkcd.com/%s" % i
         try:
             temporary = urllib.request.urlopen(url)
         except urllib.error.HTTPError:
-            print("HTTP Error " + url)
+            error = "HTTP Error " + url
+            print(error)
+            failed_commics.append(error)
             continue
         temporary = str(temporary.read())
         link_start = temporary.find("https://imgs.xkcd.com/comics/")
         if link_start == -1:
-            print("search error " + str(i))
+            error = "image link search error " + str(i)
+            print(error)
+            failed_commics.append(error)
             continue
         else:
             temporary = temporary[link_start:]
         link_end = temporary.find("\\n")
         if link_end == -1:
-            print("seach error " + str(i))
+            error = "image link search error " + str(i)
+            print(error)
+            failed_commics.append(error)
             continue
         else:
             temporary = temporary[:link_end]
             image_url = temporary.strip()
-            retrieve_and_save_images(image_url)
+            retrieve_and_save_images(image_url, failed_commics)
             if i%50 == 0:
                 print("pulled " + str(i) + "/" + str(number))
             time.sleep(random.random())
             
 def main():
+    try:
+        os.mkdir('images')
+        print('created images folder/directory')
+    except FileExistsError:
+        print('images folder/directory already exists; no new directory made')
+    failed_commics = []
     number = get_latest_commic()
-    get_all_urls(number)
+    get_all_urls(number, failed_commics)
+    print("pull complete.")
+    print("failed comics:")
+    for i in failed_commics:
+        print(i)
     
 main()
