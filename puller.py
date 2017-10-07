@@ -20,7 +20,7 @@ def retrieve_and_save_images(image_url, failed_commics):
     try:
         image = urllib.request.urlopen(image_url)
     except urllib.error.URLError:
-        error = "URL error " + image_url
+        error = "URL error " + image_url + " OR commic number " + str(i)
         print(error)
         failed_commics.append(error)
         return
@@ -37,7 +37,7 @@ def get_all_urls(number, failed_commics):
         try:
             temporary = urllib.request.urlopen(url)
         except urllib.error.HTTPError:
-            error = "HTTP Error " + url
+            error = "HTTP Error " + url + " OR commic number " + str(i)
             print(error)
             failed_commics.append(error)
             continue
